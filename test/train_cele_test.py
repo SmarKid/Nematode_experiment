@@ -1,6 +1,8 @@
 import torch
 import torchvision
 import time
+import sys
+sys.path.append('../')
 from celegans_dataset import generate_C_elegans_csv
 from celegans_dataset import CelegansDataset
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -73,7 +75,7 @@ if __name__ == '__main__':
 
     # 测试train_cele()函数
     net = torchvision.models.alexnet()
-    net.classifier[6] = torch.nn.Linear(4096, 21)
+    net.classifier[6] = torch.nn.Linear(4096, 22)
     lr, num_epochs = 0.001, 1
     optimizer = torch.optim.Adam(net.parameters(), lr=lr)
     train_cele(net, train_loader, val_loader, batch_size, optimizer, device, num_epochs)

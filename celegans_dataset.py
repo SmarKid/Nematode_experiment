@@ -84,23 +84,31 @@ def get_images_relative_path_list(DATAPATH, skip_missing_shootday=False):
     """返回所有图片文件相对路径
         
         args:
-            DATAPATH:数据集目录
+            DATAPATH:数据集绝对路径目录
             
         return:
             图片文件路径
     """
     paths = []
-    path_list = os.listdir(DATAPATH)
-    for folder in path_list:
-        path_folder = os.path.join(DATAPATH, folder)
-        if not os.path.isdir(path_folder):
-            continue
-        files = os.listdir(path_folder)
-        for file in files:
-            img_path = os.path.join(folder, file)
-            if skip_missing_shootday and (-1 == get_C_elegants_label(img_path, 'shoot_days')):
-                continue
-            paths.append(img_path)
+    
+    # 要加入的文件扩展名
+    extense_name = ['.jpg', '.JPG', '.jpeg']
+    def search_dir(root_path):
+        '''
+        遍历文件夹,将文件放入paths中
+        '''
+        path_list = os.listdir(root_path)
+        for f in path_list:
+            if os.path.isdir(os.path.join(root_path, f)):
+                search_dir(os.path.join(root_path, f))
+            elif os.path.isfile(os.path.join(root_path, f)) and os.path.splitext(f)[1] in extense_name:
+                if os.path.splitext(f)[1] not in extense_name:
+                    continue
+                elif get_C_elegants_label(f, 'shoot_days') == -1:
+                    continue
+                else:
+                    paths.append(os.path.relpath(os.path.join(root_path, f), DATAPATH))
+    search_dir(DATAPATH)
     return paths
 
 def generate_C_elegans_csv(dataset_path, csv_tar_path, num_train=None, num_val=None, shuffle=False, skip_missing_shootday=False):
@@ -108,7 +116,8 @@ def generate_C_elegans_csv(dataset_path, csv_tar_path, num_train=None, num_val=N
         args:
             dataset_path: 数据集路径，例如: 'E:\workspace\线虫数据集\图片整理'
             csv_tar_path: 生成的csv文件保存路径
-            num_test: 分配测试集样本数
+            num_train: 分配训练集样本数
+            num_val: 分配验证集样本数
             shuffle: 是否乱序
             skip_missing_shootday: 是否跳过没有拍摄时间的样本
     """
@@ -116,6 +125,7 @@ def generate_C_elegans_csv(dataset_path, csv_tar_path, num_train=None, num_val=N
     image_list = get_images_relative_path_list(dataset_path, skip_missing_shootday)
     if shuffle:
         random.shuffle(image_list)
+
     if num_train or num_val:
         list_len = len(image_list)
         if num_train == None:
@@ -175,6 +185,6 @@ class CelegansDataset(Dataset):
 
 if __name__ == '__main__':
     # 产生训练集和测试集的csv
-    dataset_path = 'E:\workspace\线虫数据集\图片整理'
-    csv_tar_path = 'E:\workspace\线虫数据集\图片整理'
-    generate_C_elegans_csv(dataset_path, csv_tar_path, num_test=50, shuffle=True)
+    dataset_path = 'E:\workspace\线虫数据集\分类数据集'
+    csv_tar_path = 'E:\workspace\线虫数据集\分类数据集'
+    generate_C_elegans_csv(dataset_path, csv_tar_path, num_val=600, shuffle=True)

@@ -5,15 +5,12 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
-import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
-import torchvision
 
 from PIL import Image
 import numpy as np
 
-import d2lzh_pytorch as d2l
 
 
 def get_C_elegants_label(filename, labels_name_required):
@@ -107,7 +104,8 @@ def get_images_relative_path_list(DATAPATH, skip_missing_shootday=False):
                 elif get_C_elegants_label(f, 'shoot_days') == -1:
                     continue
                 else:
-                    paths.append(os.path.relpath(os.path.join(root_path, f), DATAPATH))
+                    relpath = os.path.relpath(os.path.join(root_path, f), DATAPATH)
+                    paths.append(relpath)
     search_dir(DATAPATH)
     return paths
 
@@ -132,7 +130,9 @@ def generate_C_elegans_csv(dataset_path, csv_tar_path, num_train=None, num_val=N
             num_train = list_len - num_val
         if num_val ==None:
             num_val = list_len - num_train
-        cele_df_train = DataFrame(image_list[:num_train], columns=columns)
+        cele_df_train = DataFrame(image_list[:num_train], columns=columns, dtype=str)
+        if not os.path.exists(csv_tar_path):
+            os.mkdir(csv_tar_path)
         cele_df_train.to_csv(os.path.join(csv_tar_path, 'cele_df_train.csv'))
         cele_df_val = DataFrame(image_list[num_train:num_val + num_train], columns=columns)
         cele_df_val.to_csv(os.path.join(csv_tar_path, 'cele_df_val.csv'))
@@ -172,7 +172,6 @@ class CelegansDataset(Dataset):
     def __getitem__(self, idx):
         img_path_name = os.path.join(self.root_dir, self.cele_df.iloc[idx, 1])
         img_PIL = Image.open(img_path_name)
-        # image = np.array(img_PIL)
         label = get_C_elegants_label(img_path_name, self.labels_name_required) # narray (num_of_labels,)
 
         image = self.transform(img_PIL)

@@ -1,17 +1,24 @@
 import unittest
 import torch
-from torch._C import device
 import torchvision
-from train_with_alexnet import evaluate_cele_accuracy
+from tools.train import evaluate_cele_accuracy
 from celegans_dataset import CelegansDataset
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 import os
 import sys
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class TestTrain(unittest.TestCase):
     def setUp(self) -> None:
+        return super().setUp()
+    
+    def tearDown(self) -> None:
+        return super().tearDown()
+
+    def test_evaluate_cele_accuracy(self):
+        
         csv_file_val = '.\\test_csv_files\cele_df_val.csv'
         labels_name_required = 'shoot_days'
         root_dir = 'F:/线虫分类数据集'
@@ -21,12 +28,6 @@ class TestTrain(unittest.TestCase):
         val_set = CelegansDataset(labels_name_required, csv_file_val, root_dir, transform=trans)
         val_loader = torch.utils.data.DataLoader(val_set, batch_size=8)
         self.data_loader = val_loader
-        return super().setUp()
-    
-    def tearDown(self) -> None:
-        return super().tearDown()
-
-    def test_evaluate_cele_accuracy(self):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         net = torchvision.models.alexnet()
         net.classifier[6] = torch.nn.Linear(4096, 30)
@@ -67,9 +68,17 @@ class TestTrain(unittest.TestCase):
         from network import Network
         net = Network()
         print(net)
+    
+    def test_trans_old_dic_to_new(self):
+        check_point = torch.load('.\models\\alexnet\weights\old_epoch_20.pth', map_location=device)
+        weight = {'model': 'alexnet', 'epoch': 20, 'state_dict': check_point}
+        path = './models/alexnet/weights/epoch_20.pth'
+        torch.save(weight, path)
+        print()
+
 
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestTrain("test_list"))  
+    suite.addTest(TestTrain("test_trans_old_dic_to_new"))  
     unittest.TextTestRunner(verbosity=2).run(suite)

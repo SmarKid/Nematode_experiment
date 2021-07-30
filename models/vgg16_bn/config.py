@@ -15,12 +15,12 @@ class Config:
     csv_file_val = Celegans_dataset.csv_file_val
     labels_name_required = Celegans_dataset.labels_name_required
     
-    train_batch_size = 32               # 训练的batch size
-    val_batch_size = 8                  # 验证集的batch size
+    train_batch_size = 64               # 训练的batch size
+    val_batch_size = 64                  # 验证集的batch size
     TORCH_HOME = 'E:\workspace'         # 设置pytorch路径，用于指定预训练权重下载路径
     
     pretrained = True                   # 是否预训练
-    learning_rate = 0.01                # 学习率
+    learning_rate = 0.001                # 学习率
     num_epochs = 30                     # 迭代次数
 
     begin_epoch = 0                     # 起始epoch

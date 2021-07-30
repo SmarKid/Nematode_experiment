@@ -9,12 +9,12 @@ from torchvision import transforms
 from lib.celegans_dataset import CelegansDataset, get_C_elegants_label
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def inference(args, config, Network):
-    net = Network()
+def inference(args, config, network):
+    net = network()
     net.to(device)
     net.eval() # 评估模式, 这会关闭dropout
     if args.resume_weights:
-        model_file = os.path.join("./models/", args.model_dir, 'weights/epoch_%d.pth' % args.resume_weights)
+        model_file = os.path.join("./models/", args.model_dir, 'weights/out of date/epoch_%d.pth' % args.resume_weights)
         check_point = torch.load(model_file, map_location=device)
         net.load_state_dict(check_point['state_dict'])
     ex_name = os.path.splitext(args.file_path)[1]
@@ -77,6 +77,6 @@ if __name__ == '__main__':
     model_root_dir = os.path.join('./models/', args.model_dir)
     sys.path.insert(0, model_root_dir)
     from config import config
-    from network import Network
-    inference(args, config, Network)
+    from network import network
+    inference(args, config, network)
 

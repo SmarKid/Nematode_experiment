@@ -2,7 +2,7 @@ import unittest
 import torch
 import torchvision
 from tools.train import evaluate_cele_accuracy
-from celegans_dataset import CelegansDataset
+from lib.celegans_dataset import CelegansDataset
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -70,9 +70,9 @@ class TestTrain(unittest.TestCase):
         print(net)
     
     def test_trans_old_dic_to_new(self):
-        check_point = torch.load('.\models\\alexnet\weights\old_epoch_20.pth', map_location=device)
-        weight = {'model': 'alexnet', 'epoch': 20, 'state_dict': check_point}
-        path = './models/alexnet/weights/epoch_20.pth'
+        check_point = torch.load('.\models\\alexnet\weights\epoch_0.pth', map_location=device)
+        weight = {'model': 'alexnet', 'epoch': 0, 'state_dict': check_point}
+        path = './models/alexnet/weights/epoch_0.pth'
         torch.save(weight, path)
         print()
 

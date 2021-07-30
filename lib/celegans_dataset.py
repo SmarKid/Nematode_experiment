@@ -77,7 +77,7 @@ def get_images_path_list(DATAPATH):
             paths.append(img_path)
     return paths
 
-def get_images_relative_path_list(DATAPATH, skip_missing_shootday=False):
+def get_images_relative_path_list(DATAPATH, skip_missing_shootday=True):
     """返回所有图片文件相对路径
         
         args:
@@ -98,10 +98,10 @@ def get_images_relative_path_list(DATAPATH, skip_missing_shootday=False):
         for f in path_list:
             if os.path.isdir(os.path.join(root_path, f)):
                 search_dir(os.path.join(root_path, f))
-            elif os.path.isfile(os.path.join(root_path, f)) and os.path.splitext(f)[1] in extense_name:
+            elif os.path.isfile(os.path.join(root_path, f)):
                 if os.path.splitext(f)[1] not in extense_name:
                     continue
-                elif get_C_elegants_label(f, 'shoot_days') == -1:
+                elif skip_missing_shootday and get_C_elegants_label(f, 'shoot_days') == -1:
                     continue
                 else:
                     relpath = os.path.relpath(os.path.join(root_path, f), DATAPATH)
@@ -109,7 +109,7 @@ def get_images_relative_path_list(DATAPATH, skip_missing_shootday=False):
     search_dir(DATAPATH)
     return paths
 
-def generate_C_elegans_csv(dataset_path, csv_tar_path, num_train=None, num_val=None, shuffle=False, skip_missing_shootday=False):
+def generate_C_elegans_csv(dataset_path, csv_tar_path, num_train=None, num_val=None, shuffle=False, skip_missing_shootday=True):
     """
         args:
             dataset_path: 数据集路径，例如: 'E:\workspace\线虫数据集\图片整理'

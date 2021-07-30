@@ -115,6 +115,7 @@ if __name__ == '__main__':
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=config.train_batch_size)
     val_loader = torch.utils.data.DataLoader(val_set, batch_size=config.val_batch_size)
 
+    os.environ['TORCH_HOME'] = config.TORCH_HOME
     net = network(pretrained=config.pretrained)
     if config.resume_weights:
         model_file = os.path.join("./models/", config.model_dir, 'weights/epoch_%d.pth' % config.resume_weights)

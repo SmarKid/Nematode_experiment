@@ -1,4 +1,5 @@
 import unittest
+from PIL import Image
 import torch
 import torchvision
 from tools.train import evaluate_cele_accuracy
@@ -76,9 +77,29 @@ class TestTrain(unittest.TestCase):
         torch.save(weight, path)
         print()
 
+    def test_augmentation(self):
+        img = Image.open('E:\\workspace\\线虫数据集\\分类数据集\\图片整理\\5_0.333_0.417\\h_2_7_7_1.JPG')
+        def show_images(imgs, num_rows, num_cols, scale=2):
+            figsize = (num_cols * scale, num_rows * scale)
+            _, axes = plt.subplots(num_rows, num_cols, figsize=figsize)
+            for i in range(num_rows):
+                for j in range(num_cols):
+                    axes[i][j].imshow(imgs[i * num_cols + j])
+                    axes[i][j].axes.get_xaxis().set_visible(False)
+                    axes[i][j].axes.get_yaxis().set_visible(False)
+            return axes
+
+        def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
+            Y = [aug(img) for _ in range(num_rows * num_cols)]
+            axes = show_images(Y, num_rows, num_cols, scale)
+            plt.show()
+            print()
+        from models.alexnet.config import config
+        apply(img, config.trans)
+
 
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestTrain("test_trans_old_dic_to_new"))  
+    suite.addTest(TestTrain("test_augmentation"))  
     unittest.TextTestRunner(verbosity=2).run(suite)

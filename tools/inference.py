@@ -10,26 +10,19 @@ from lib.celegans_dataset import CelegansDataset, get_C_elegants_label
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def inference(args, config, network):
-    net = network()
+    net = network(pretrained=True)
     net.to(device)
     net.eval() # 评估模式, 这会关闭dropout
     if args.resume_weights:
-        model_file = os.path.join("./models/", args.model_dir, 'weights/out of date/epoch_%d.pth' % args.resume_weights)
+        model_file = os.path.join("./models/", args.model_dir, 'weights/epoch_%d.pth' % args.resume_weights)
         check_point = torch.load(model_file, map_location=device)
         net.load_state_dict(check_point['state_dict'])
     ex_name = os.path.splitext(args.file_path)[1]
-    trans = transforms.Compose([
-        transforms.Resize(size=(400, 600))
-    ])
-    if ex_name in ['.JPG']:
+    if ex_name in ['.JPG', '.jpeg']:
         file_path = os.path.normpath(args.file_path)
         img_PIL = Image.open(file_path)
         label = get_C_elegants_label(args.file_path, config.labels_name_required)
-        trans = transforms.Compose([
-            trans,
-            transforms.ToTensor()
-        ])
-        image = trans(img_PIL)
+        image = config.trans['val_trans'](img_PIL)
         image = torch.unsqueeze(image, 0)
 
         output = net(image.to(device))
@@ -40,7 +33,8 @@ def inference(args, config, network):
 
     elif ex_name in ['.csv']:
         file_path = os.path.normpath(args.file_path)
-        test_set = CelegansDataset(config.labels_name_required, file_path, config.root_dir, transform=trans)
+        test_set = CelegansDataset(config.labels_name_required, file_path, config.root_dir, 
+                transform=config.trans['val_trans'])
         test_loader = torch.utils.data.DataLoader(test_set, batch_size=config.val_batch_size)
         df = pd.read_csv(file_path)
         columns = ['file_path', 'predict_label', 'true_label', 'confidence']
@@ -66,7 +60,7 @@ def inference(args, config, network):
                 batch_return = np.stack((file_paths, predict_labels, true_labels, confidence), axis=1)
                 ret = np.concatenate((ret, batch_return))
         ret_df = pd.DataFrame(ret, columns=columns, dtype=str)
-        ret_df.to_csv('./output.csv')
+        ret_df.to_csv('./epoch_%d_output.csv' % args.resume_weights)
                 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

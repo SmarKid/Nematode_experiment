@@ -157,14 +157,7 @@ class CelegansDataset(Dataset):
         self.cele_df = pd.read_csv(csv_file)
         self.root_dir = root_dir
         if transform:
-            self.transform = transforms.Compose([
-                transform,
-                transforms.ToTensor()
-            ])
-        else:
-            self.transform = transforms.Compose([
-                transforms.ToTensor()
-            ])
+            self.transform = transform
 
     def __len__(self):
         return len(self.cele_df)

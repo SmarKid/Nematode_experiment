@@ -1,9 +1,11 @@
 import sys
 import unittest
-from unittest.case import TestCase
 import torchvision
 import torch
 sys.path.append('../')
+from unittest.case import TestCase
+from numpy import multiply, sqrt
+from numpy.lib.npyio import save
 from lib.celegans_dataset import *
 
 class TestCelegansDataset(unittest.TestCase):
@@ -101,8 +103,62 @@ class TestCelegansDataset(unittest.TestCase):
         ax.legend() 
         plt.savefig('cele_df_val distribution.jpg')
 
+    def test_distribution_of_csv_pie(self):
+        filepath = 'E:\workspace\python\\线虫实验\\test\csv_files\cele_df_train.csv' # csv path
+        import pandas as pd
+        df = pd.read_csv(filepath)
+        df_path = df['path']
+        l = list(df_path)
+
+        cnt = {}
+        labels_name_required = 'shoot_days'
+        for path in l:
+            shoot_day = get_C_elegants_label(path, labels_name_required)
+            if shoot_day not in cnt:
+                cnt[shoot_day] = 1
+            else:
+                cnt[shoot_day] += 1
+        after = dict(sorted(cnt.items(), key=lambda e: e[0]))
+        for k, v in after.items():
+            print(k, v)
+
+        import matplotlib.pyplot as plt
+        plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
+        plt.pie(after.values(),labels=after.keys(),autopct='%1.1f%%',startangle=150)
+        plt.title("线虫训练集样本分布")
+        plt.savefig('cele_df_train distribution pie.jpg')
+        print()
+
+    def test_compute_class_weight(self):
+        filepath = 'E:\workspace\python\\线虫实验\\test\csv_files\cele_df_train.csv' # csv path
+        import pandas as pd
+        df = pd.read_csv(filepath)
+        df_path = df['path']
+        l = list(df_path)
+
+        cnt = [0 for i in range(30)]
+        labels_name_required = 'shoot_days'
+        for path in l:
+            shoot_day = get_C_elegants_label(path, labels_name_required)
+            cnt[shoot_day] += 1
+        num_list = np.array(cnt)
+        
+        bottom = num_list * (1 / (np.max(num_list) + 100))
+        weights = 1 - np.sqrt(bottom)
+        weights = torch.tensor(weights, dtype=torch.float32)
+        torch.save(weights, 'class_weights.pt')
+
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()  
+        ax.plot(range(30), weights, label='weight')  
+        ax.set_xlabel('key')  
+        ax.set_ylabel('weight')  
+        ax.set_title("weight_set_distribution")  
+        ax.legend() 
+        plt.savefig('weight_set_distribution.jpg')
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestCelegansDataset("test_distribution_of_csv")) 
+    suite.addTest(TestCelegansDataset("test_compute_class_weight")) 
     unittest.TextTestRunner(verbosity=2).run(suite)

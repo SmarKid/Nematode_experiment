@@ -10,7 +10,7 @@ from lib.celegans_dataset import *
 
 class TestCelegansDataset(unittest.TestCase):
     def setUp(self) -> None:
-        self.root_dir = 'F:/线虫分类数据集'
+        self.root_dir = 'F:/线虫分类数据�?'
         self.csv_tar_path = './test_csv_files'
         if not os.path.exists(self.csv_tar_path):
             os.mkdir(self.csv_tar_path)
@@ -50,7 +50,7 @@ class TestCelegansDataset(unittest.TestCase):
             torch.save(net.state_dict(), weight_path)
     
     def test_sample_distrabute(self):
-        DATAPATH = 'E:\workspace\线虫数据集'
+        DATAPATH = 'E:\workspace\线虫数据�?'
         skip_missing = True
         l = get_images_relative_path_list(DATAPATH, skip_missing_shootday=False)
         max = -1
@@ -125,13 +125,13 @@ class TestCelegansDataset(unittest.TestCase):
         import matplotlib.pyplot as plt
         plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
         plt.pie(after.values(),labels=after.keys(),autopct='%1.1f%%',startangle=150)
-        plt.title("线虫训练集样本分布")
+        plt.title("线虫训练集样本分�?")
         plt.savefig('cele_df_train distribution pie.jpg')
         print()
 
     def test_compute_class_weight(self):
         '''
-            计算类的权重并保存，用于平衡数据集偏斜
+            计算类的权重并保存，用于平衡数据集偏�?
         '''
         filepath = 'E:\workspace\python\\线虫实验\\csv files\cele_df_train.csv' # csv path
         import pandas as pd
@@ -186,8 +186,28 @@ class TestCelegansDataset(unittest.TestCase):
         # ax.legend() 
         # plt.savefig('cele_df_val distribution.jpg')
 
+    def make_a_test_dataset(self):
+        root_dir = 'D:\WorkSpace\datasets\线虫数据集\分类数据集'
+        tar_dir = 'D:\WorkSpace\datasets\线虫数据集\分类测试数据集'
+        cnt = [0 for i in range(30)]
+        extense_name = ['.jpg', '.JPG', '.jpeg']
+        def search_dir(root_path):
+            path_list = os.listdir(root_path)
+            for f in path_list:
+                if os.path.isdir(os.path.join(root_path, f)):
+                    search_dir(os.path.join(root_path, f))
+                elif os.path.isfile(os.path.join(root_path, f)):
+                    if os.path.splitext(f)[1] not in extense_name:
+                        continue
+                    else:
+                        label = get_C_elegants_label(f, 'shoot_days')
+                        if label == -1: continue
+                        if cnt[label] > 50: continue
+                        pass
+        search_dir(root_dir)
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestCelegansDataset("test_compute_class_weight")) 
+    suite.addTest(TestCelegansDataset("make_a_test_dataset")) 
     unittest.TextTestRunner(verbosity=2).run(suite)

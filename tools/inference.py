@@ -18,7 +18,7 @@ def inference(args, config, network):
         check_point = torch.load(model_file, map_location=device)
         net.load_state_dict(check_point['state_dict'])
     ex_name = os.path.splitext(args.file_path)[1]
-    if ex_name in ['.JPG', '.jpeg']:
+    if ex_name in ['.JPG', '.jpeg', '.jpg']:
         file_path = os.path.normpath(args.file_path)
         img_PIL = Image.open(file_path)
         label = get_C_elegants_label(args.file_path, config.labels_name_required)

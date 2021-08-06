@@ -51,7 +51,6 @@ class Config:
     pretrained = True                   # 是否预训练
     learning_rate = 0.01                # 学习率
     num_epochs = 30                  # 迭代次数
-    optimizer = 'Adam'
     weight_decay = 0.001
 
 

@@ -78,6 +78,9 @@ class TestTrain(unittest.TestCase):
         print()
 
     def test_augmentation(self):
+        '''
+            测试数据增强
+        '''
         img = Image.open('E:\\workspace\\线虫数据集\\分类数据集\\图片整理\\5_0.333_0.417\\h_2_7_7_1.JPG')
         def show_images(imgs, num_rows, num_cols, scale=2):
             figsize = (num_cols * scale, num_rows * scale)

@@ -130,11 +130,15 @@ class TestCelegansDataset(unittest.TestCase):
         print()
 
     def test_compute_class_weight(self):
-        filepath = 'E:\workspace\python\\线虫实验\\test\csv_files\cele_df_train.csv' # csv path
+        '''
+            计算类的权重并保存，用于平衡数据集偏斜
+        '''
+        filepath = 'E:\workspace\python\\线虫实验\\csv files\cele_df_train.csv' # csv path
         import pandas as pd
         df = pd.read_csv(filepath)
         df_path = df['path']
         l = list(df_path)
+        sum_num = len(l)
 
         cnt = [0 for i in range(30)]
         labels_name_required = 'shoot_days'
@@ -143,19 +147,44 @@ class TestCelegansDataset(unittest.TestCase):
             cnt[shoot_day] += 1
         num_list = np.array(cnt)
         
-        bottom = num_list * (1 / (np.max(num_list) + 100))
-        weights = 1 - np.sqrt(bottom)
+        # bottom = num_list * (1 / (np.max(num_list) + 100))
+        # weights = 1 - np.sqrt(bottom)
+
+        weights = 1 / sum_num / num_list
+
         weights = torch.tensor(weights, dtype=torch.float32)
+        weights = np.ma.masked_invalid(weights)
+        def normalization(data):
+            _range = np.max(data) - np.min(data)
+            return (data - np.min(data)) / _range
+        norm_weights = normalization(weights)
         torch.save(weights, 'class_weights.pt')
 
         import matplotlib.pyplot as plt
         fig, ax = plt.subplots()  
-        ax.plot(range(30), weights, label='weight')  
-        ax.set_xlabel('key')  
+        ax.plot(range(30), norm_weights, label='weight')  
+        ax.set_xlabel('label')  
         ax.set_ylabel('weight')  
-        ax.set_title("weight_set_distribution")  
+        ax.set_title("train_class_norm_weights_distribution")  
         ax.legend() 
-        plt.savefig('weight_set_distribution.jpg')
+        plt.savefig('train_class_norm_weights_distribution.jpg')
+        pass
+
+    def test_pic(self):
+        fig, ax = plt.subplots()  
+        y = [-3.5456, -0.5751,  0.0191,  0.0858, -0.1081,  0.3676,  0.3517,  0.5990,
+          0.3631,  0.3145,  0.3673,  0.4723,  0.5808,  0.7390,  0.5919,  0.5214,
+          0.4162,  0.5394,  0.0973,  0.1094, -0.3411, -0.1097, -0.6302, -2.4475,
+         -3.5475, -3.5422, -1.5136, -2.5208, -1.5947, -1.8931]
+        
+        ax.plot(range(30), y)  
+        plt.show()
+        pass
+        # ax.set_xlabel('key')  
+        # ax.set_ylabel('num')  
+        # ax.set_title("num of sample")  
+        # ax.legend() 
+        # plt.savefig('cele_df_val distribution.jpg')
 
 
 if __name__ == '__main__':

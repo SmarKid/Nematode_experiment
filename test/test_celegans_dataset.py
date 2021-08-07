@@ -140,7 +140,7 @@ class TestCelegansDataset(unittest.TestCase):
         l = list(df_path)
         sum_num = len(l)
 
-        cnt = [0 for i in range(30)]
+        cnt = [1 for i in range(30)]
         labels_name_required = 'shoot_days'
         for path in l:
             shoot_day = get_C_elegants_label(path, labels_name_required)
@@ -153,8 +153,8 @@ class TestCelegansDataset(unittest.TestCase):
         weights = 1 / sum_num / num_list
 
         weights = torch.tensor(weights, dtype=torch.float32)
-        weights = np.ma.masked_invalid(weights)
         def normalization(data):
+            data = np.ma.masked_invalid(data)
             _range = np.max(data) - np.min(data)
             return (data - np.min(data)) / _range
         norm_weights = normalization(weights)

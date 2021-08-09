@@ -2,6 +2,7 @@ from torch.hub import load_state_dict_from_url
 import torchvision
 from torch.nn import init
 import torch
+import os
 model_urls = {
     'alexnet': 'https://download.pytorch.org/models/alexnet-owt-7be5be79.pth',
 }

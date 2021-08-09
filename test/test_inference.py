@@ -1,6 +1,8 @@
 import unittest
 import numpy
 import torch
+import sys
+import os
 from torch._C import dtype
 class TestTrain(unittest.TestCase):
     def setUp(self) -> None:
@@ -30,8 +32,17 @@ class TestTrain(unittest.TestCase):
         # t = torch.tensor([[1, 2, 3], [3, 4, 5]])
         # out = torch.gather(t, 1, torch.tensor([[2], [0]]))
         # print(out)
+    
+    def test_inference(self):
+        model_root_dir = os.path.join('./models/', 'efficientnetV2')
+        sys.path.insert(0, model_root_dir)
+        from network import network
+        net = network()
+        X = torch.rand((5, 3, 300, 300))
+        out = net(X)
+        pass
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestTrain("test_array"))  
+    suite.addTest(TestTrain("test_inference"))  
     unittest.TextTestRunner(verbosity=2).run(suite)

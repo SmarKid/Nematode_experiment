@@ -26,31 +26,31 @@ class Config:
 
     # 训练设置
     normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    pretrained_path = ''
+    pretrained_path = 'E:\\workspace\\python\\线虫实验\\models\\efficientnetV2\\weights\\pre_efficientnetv2-s.pth'            # 预训练权重路径
     trans = {
         'train_trans': torchvision.transforms.Compose([
-            torchvision.transforms.RandomResizedCrop((400, 600), scale=(0.1, 1), ratio=(0.5, 2)),
-            torchvision.transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.2),
+            torchvision.transforms.RandomResizedCrop((300, 300), scale=(0.5, 1), ratio=(0.5, 2)),
+            torchvision.transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
             torchvision.transforms.RandomHorizontalFlip(),
             torchvision.transforms.RandomVerticalFlip(),
             torchvision.transforms.ToTensor(),
             normalize
         ]),
         'val_trans': torchvision.transforms.Compose([
-            torchvision.transforms.Resize((400, 600)),
+            torchvision.transforms.Resize((384, 384)),
             torchvision.transforms.ToTensor(),
             normalize
         ])
     }
-    train_batch_size = 64                   # 训练的batch size
-    val_batch_size = 64                     # 验证集的batch size
+    train_batch_size = 8                   # 训练的batch size
+    val_batch_size = 8                     # 验证集的batch size
     begin_epoch = 0                         # 起始epoch
-    train_require_layers = 'classifier'   # 需要训练的层
+    train_require_layers = 'head'   # 需要训练的层
 
     # 模型相关设置
     TORCH_HOME = 'E:\workspace'         # 设置pytorch路径，用于指定预训练权重下载路径
     learning_rate = 0.01                # 学习率
-    num_epochs = 30                  # 迭代次数
+    num_epochs = 10               # 迭代次数
     weight_decay = 0.001
 
 

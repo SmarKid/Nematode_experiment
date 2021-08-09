@@ -14,7 +14,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # tensorboard文件
 from torch.utils.tensorboard import SummaryWriter
-tb_writer = SummaryWriter(log_dir='runs/elegans_experience/')
+tb_writer = SummaryWriter(log_dir='runs')
 
 # 配置日志
 file_handler = logging.FileHandler(filename='./log/logging.log', mode='a', encoding='utf-8')
@@ -38,7 +38,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch):
     optimizer.zero_grad()
 
     sample_num = 0
-    data_loader = tqdm(data_loader)
+    data_loader = tqdm.tqdm(data_loader)
     for step, data in enumerate(data_loader):
         images, labels = data['image'], data['label']
         sample_num += images.shape[0]
@@ -86,7 +86,7 @@ def train_cele(net, train_loader, val_loader, optimizer, device, config):
     for epoch in range(config.begin_epoch, config.num_epochs):
         
         epoch += 1
-        train_loss, train_acc = train_one_epoch(model, optimizer, train_loader, device, epoch)
+        train_loss, train_acc = train_one_epoch(net, optimizer, train_loader, device, epoch)
         val_acc, val_loss = evaluate(val_loader, net, device)
 
         tags = ["train_loss", "train_acc", "val_loss", "val_acc", "learning_rate"]
@@ -163,13 +163,14 @@ if __name__ == '__main__':
     val_loader = torch.utils.data.DataLoader(val_set, num_workers=nw, batch_size=batch_size)
 
     # 加载预训练
-    os.environ['TORCH_HOME'] = config.TORCH_HOME
-    net = network(pretrained=config.pretrained)
     if config.resume_weights:
+        net = network()
         model_file = os.path.join("./models/", config.model_dir, 'weights/epoch_%d.pth' % config.resume_weights)
         check_point = torch.load(model_file, map_location=device)
         config.begin_epoch = config.resume_weights
         net.load_state_dict(check_point['state_dict'])
+    elif config.pretrained_path:
+        net = network(pretrained_path=config.pretrained_path)
 
     # 将模型写入tensorboard
     init_img = torch.zeros((1, 3, 400, 600), device=device)

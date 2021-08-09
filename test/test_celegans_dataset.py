@@ -185,14 +185,18 @@ class TestCelegansDataset(unittest.TestCase):
         # ax.set_title("num of sample")  
         # ax.legend() 
         # plt.savefig('cele_df_val distribution.jpg')
-
+    
     def make_a_test_dataset(self):
-        root_dir = 'D:\WorkSpace\datasets\线虫数据集\分类数据集'
-        tar_dir = 'D:\WorkSpace\datasets\线虫数据集\分类测试数据集'
+        import shutil
+        from natsort import ns, natsorted
+        root_dir = 'E:\workspace\线虫数据集\分类数据集'
+        tar_dir = 'E:\workspace\线虫数据集\分类测试数据集'
         cnt = [0 for i in range(30)]
+        paths = []
         extense_name = ['.jpg', '.JPG', '.jpeg']
         def search_dir(root_path):
             path_list = os.listdir(root_path)
+            path_list = natsorted(path_list,alg=ns.PATH)
             for f in path_list:
                 if os.path.isdir(os.path.join(root_path, f)):
                     search_dir(os.path.join(root_path, f))
@@ -202,9 +206,18 @@ class TestCelegansDataset(unittest.TestCase):
                     else:
                         label = get_C_elegants_label(f, 'shoot_days')
                         if label == -1: continue
-                        if cnt[label] > 50: continue
-                        pass
+                        if cnt[label] >= 10: continue
+                        file_path = os.path.join(root_path, f)
+                        tar_path = os.path.join(tar_dir, f)
+                        shutil.copyfile(file_path,tar_path) 
+                        paths.append(f)
+                        cnt[label] += 1 
         search_dir(root_dir)
+        print(cnt)
+        columns = ['path']
+        paths = natsorted(paths,alg=ns.PATH)
+        cele_df_test = DataFrame(paths, columns=columns)
+        cele_df_test.to_csv(os.path.join(tar_dir, 'cele_df_test.csv'))
 
 
 if __name__ == '__main__':

@@ -5,7 +5,8 @@ from torchvision.transforms.transforms import Resize, ToTensor
 
 
 class Celegans_dataset:
-    root_dir = 'E:\workspace\线虫数据集\分类数据集'             # 数据集根目录
+    root_dir = 'D:\WorkSpace\datasets\线虫数据集\分类数据集'             # 数据集根目录
+    # root_dir = 'E:\workspace\线虫数据集\分类数据集' 
     csv_tar_path = '.\csv files'                                # 包含csv文件的文件夹
     csv_file_train = '.\\csv files\cele_df_train.csv'           # 训练集csv文件路径
     csv_file_val = '.\\csv files\cele_df_val.csv'               # 测试集csv文件路径
@@ -26,7 +27,6 @@ class Config:
 
     # 训练设置
     normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    pretrained_path = 'E:\\workspace\\python\\线虫实验\\models\\efficientnetV2\\weights\\pre_efficientnetv2-s.pth'            # 预训练权重路径
     trans = {
         'train_trans': torchvision.transforms.Compose([
             torchvision.transforms.RandomResizedCrop((300, 300), scale=(0.5, 1), ratio=(0.5, 2)),
@@ -46,9 +46,9 @@ class Config:
     val_batch_size = 8                     # 验证集的batch size
     begin_epoch = 0                         # 起始epoch
     train_require_layers = 'head'   # 需要训练的层
+    pretrained_path = 'D:\\WorkSpace\\PycharmProjects\\Nematode_experiment\\models\\efficientnetV2\\weights\\pre_efficientnetv2-s.pth' # 预训练权重路径
 
     # 模型相关设置
-    TORCH_HOME = 'E:\workspace'         # 设置pytorch路径，用于指定预训练权重下载路径
     learning_rate = 0.01                # 学习率
     num_epochs = 10               # 迭代次数
     weight_decay = 0.001

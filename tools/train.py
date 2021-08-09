@@ -1,13 +1,9 @@
 import torch
-import torchvision
-import time
 import logging
 import argparse
 import sys
 import os
-from torchvision import models
 import tqdm
-import matplotlib.pyplot as plt
 sys.path.append('../')
 from lib.celegans_dataset import CelegansDataset
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -173,7 +169,7 @@ if __name__ == '__main__':
         net = network(pretrained_path=config.pretrained_path)
 
     # 将模型写入tensorboard
-    init_img = torch.zeros((1, 3, 400, 600), device=device)
+    init_img = torch.zeros((1, 3, 300, 300))
     tb_writer.add_graph(net, init_img)
 
     # 优化器

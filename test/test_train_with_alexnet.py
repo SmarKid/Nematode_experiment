@@ -2,7 +2,7 @@ import unittest
 from PIL import Image
 import torch
 import torchvision
-from tools.train import evaluate_cele_accuracy
+from tools.train import evaluate
 from lib.celegans_dataset import CelegansDataset
 import matplotlib.pyplot as plt
 import numpy as np
@@ -99,10 +99,29 @@ class TestTrain(unittest.TestCase):
             print()
         from models.alexnet.config import config
         apply(img, config.trans)
+    
+    def test_evaluate(self):
+        csv_file_val = '.\\test\\csv files\\cele_df_val.csv'
+        labels_name_required = 'shoot_days'
+        root_dir = 'E:\workspace\线虫数据集\分类数据集'
+        normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        trans = torchvision.transforms.Compose([
+            torchvision.transforms.Resize((384, 384)),
+            torchvision.transforms.ToTensor(),
+            normalize
+        ])
+        val_set = CelegansDataset(labels_name_required, csv_file_val, root_dir, transform=trans)
+        val_loader = torch.utils.data.DataLoader(val_set, batch_size=8)
+        self.data_loader = val_loader
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        from models.efficientnetV2.network import network
+        net = network()
+        test_acc, test_loss = evaluate(data_loader=self.data_loader, model=net, device=device, epoch=1)
+        print(test_acc, test_loss)
 
 
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestTrain("test_augmentation"))  
+    suite.addTest(TestTrain("test_evaluate"))  
     unittest.TextTestRunner(verbosity=2).run(suite)

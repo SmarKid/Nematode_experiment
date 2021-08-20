@@ -83,7 +83,7 @@ def train_cele(net, train_loader, val_loader, optimizer, device, config):
         
         epoch += 1
         train_loss, train_acc = train_one_epoch(net, optimizer, train_loader, device, epoch)
-        val_acc, val_loss = evaluate(val_loader, net, device)
+        val_acc, val_loss = evaluate(net, val_loader, device, epoch)
 
         tags = ["train_loss", "train_acc", "val_loss", "val_acc", "learning_rate"]
         tb_writer.add_scalar(tags[0], train_loss, epoch)
@@ -112,7 +112,7 @@ def evaluate(model, data_loader, device, epoch):
     accu_loss = torch.zeros(1).to(device)  # 累计损失
 
     sample_num = 0
-    data_loader = tqdm(data_loader)
+    data_loader = tqdm.tqdm(data_loader)
     for step, data in enumerate(data_loader):
         images, labels = data['image'], data['label']
         sample_num += images.shape[0]
@@ -174,9 +174,9 @@ if __name__ == '__main__':
 
     # 优化器
     params = []
-    for name, model in net.named_children():
+    for name, mdl in net.named_children():
         if name in config.train_require_layers:
-            params.append({'params': model.parameters()})
+            params.append({'params': mdl.parameters()})
 
     optimizer = torch.optim.Adam(params, lr=config.learning_rate, 
             weight_decay=config.weight_decay)

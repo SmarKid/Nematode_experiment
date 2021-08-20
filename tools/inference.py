@@ -30,37 +30,6 @@ def inference(args, config, network):
         print('预测标签为: %d' % infer_label)
         print('真实标签为: %d' % label)
         print('预测置信度为: %lf' % output[0, infer_label])
-
-    elif ex_name in ['.csv']:
-        file_path = os.path.normpath(args.file_path)
-        test_set = CelegansDataset(config.labels_name_required, file_path, config.root_dir, 
-                transform=config.trans['val_trans'])
-        test_loader = torch.utils.data.DataLoader(test_set, batch_size=config.val_batch_size)
-        df = pd.read_csv(file_path)
-        columns = ['file_path', 'predict_label', 'true_label', 'confidence']
-        batch_count = 0
-        ret = np.empty((0,4))
-        import tqdm
-        with torch.no_grad():
-            for batch in tqdm.tqdm(test_loader):
-                X = batch['image']
-                true_labels = batch['label']
-                true_labels = np.array(true_labels)
-                outputs = net(X.to(device))
-                outputs = np.array(outputs)
-                predict_labels = outputs.argmax(axis=1)
-                predict_labels = np.array(predict_labels)
-                confidence = outputs[range(len(outputs)),  predict_labels]
-                start = batch_count * config.val_batch_size
-                end = start + config.val_batch_size
-                end = end if end < len(df) else len(df)
-                file_paths = df.iloc[start:end, 1]
-                file_paths = np.array(file_paths)
-                batch_count += 1
-                batch_return = np.stack((file_paths, predict_labels, true_labels, confidence), axis=1)
-                ret = np.concatenate((ret, batch_return))
-        ret_df = pd.DataFrame(ret, columns=columns, dtype=str)
-        ret_df.to_csv('./epoch_%d_output.csv' % args.resume_weights)
                 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -7,8 +7,8 @@ from torchvision.transforms.transforms import Resize, ToTensor
 class Celegans_dataset:
     root_dir = 'E:\workspace\线虫数据集\分类数据集'             # 数据集根目录
     csv_tar_path = '.\csv files'                                # 包含csv文件的文件夹
-    csv_file_train = '.\\csv files\cele_df_train.csv'           # 训练集csv文件路径
-    csv_file_val = '.\\csv files\cele_df_val.csv'               # 测试集csv文件路径
+    csv_file_train = '.\\test csv files\cele_df_train.csv'           # 训练集csv文件路径
+    csv_file_val = '.\\test csv files\cele_df_val.csv'               # 测试集csv文件路径
     # 需要的标签信息,可选的值有:['part', 'batch', 'elegans_id', 'remaining_days', 'photo_id', 'shoot_days']
     labels_name_required = 'shoot_days'   
     class_weights_path = 'class_weights.pt'                      

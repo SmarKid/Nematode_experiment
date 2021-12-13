@@ -13,7 +13,7 @@ class CelegansDataset:
     csv_file_test = r'D:\Dataset\线虫分类数据集\csv files\cele_df_test.csv'               # 测试集csv文件路径
     # 需要的标签信息,可选的值有:['part', 'batch', 'elegans_id', 'remaining_days', 'photo_id', 'shoot_days']
     labels_name_required = 'shoot_days'   
-    class_weights_path = 'class_weights.pt'                      
+    class_weights_path = 'class_weights.pt'
 
 
 class Config:
@@ -30,19 +30,17 @@ class Config:
     class_weights_path = CelegansDataset.class_weights_path
 
     # 训练设置
-    optimizer = 'SGD'
-    # SGD
-    momentum = 0.9
-    weight_decay = 5E-5
-    dampening = 0
-    nesterov = False
-    # ADAM
-    beta1 = 0.9
-    beta2 = 0.999
-    epsilon = 1e-08
-    amsgrad = False
-    loss_function = 'CrossEntropyLoss'
-    weight = torch.load('class_weights.pt')
+    optimizer = 'AdamW'
+    optim_args = {
+        'AdamW': {
+            'lr': 0.0000005,  # 学习率
+            'weight_decay': 5E-2,
+            'betas': (0.9, 0.999),
+            'eps': 1e-8
+        }
+    }
+
+    loss_function = 'LabelSmoothingCrossEntropy'
     normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     trans = {
         'train_trans': torchvision.transforms.Compose([
@@ -59,16 +57,15 @@ class Config:
             normalize
         ])
     }
-    train_batch_size = 29                   # 训练的batch size
-    val_batch_size = 8                     # 验证集的batch size
+    train_batch_size = 8                   # 训练的batch size
+    val_batch_size = 1                     # 验证集的batch size
     begin_epoch = 0                         # 起始epoch
     train_require_layers = None    # 需要训练的层
 
     # 模型相关设置
-    pretrained_path = 'E:/workspace/python/线虫实验/models/vision_transformer/weights/vit_base_patch16_224_in21k.pth'
+    pretrained_path = r"E:\workspace\python\线虫实验\models\swin_transformer\weights\swin_tiny_patch4_window7_224.pth"
     TORCH_HOME = 'E:/workspace'         # 设置pytorch路径，用于指定预训练权重下载路径
     pretrained = True                   # 是否预训练
-    learning_rate = 0               # 学习率
     num_epochs = 100                  # 迭代次数
 
 

@@ -10,10 +10,11 @@ from lib.celegans_dataset import *
 
 class TestCelegansDataset(unittest.TestCase):
     def setUp(self) -> None:
-        self.root_dir = 'F:/线虫分类数据�?'
+        self.root_dir = 'E:\workspace\线虫数据集\分类数据集'
         self.csv_tar_path = './test_csv_files'
         if not os.path.exists(self.csv_tar_path):
             os.mkdir(self.csv_tar_path)
+        pass
 
     def tearDown(self) -> None:
         return super().tearDown()
@@ -24,19 +25,69 @@ class TestCelegansDataset(unittest.TestCase):
         generate_C_elegans_csv(self.root_dir, self.csv_tar_path, num_val=10, num_train=10, shuffle=True)
 
     def test_CelegansDataset(self):
-        csv_file_train = '.\csv_files\cele_df_train.csv'
-        csv_file_val = '.\csv_files\cele_df_val.csv'
+        csv_file_train = 'csv files/cele_df_train.csv'
+        csv_file_val = 'csv files/cele_df_val.csv'
         labels_name_required = 'shoot_days'
+        normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         trans = torchvision.transforms.Compose([
-            torchvision.transforms.Resize(size=(400, 600))
+            torchvision.transforms.RandomResizedCrop((224, 224), scale=(0.5, 1), ratio=(0.5, 2)),
+            torchvision.transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+            torchvision.transforms.RandomHorizontalFlip(),
+            torchvision.transforms.RandomVerticalFlip(),
+            torchvision.transforms.ToTensor(),
+            normalize
         ])
-        train_set = CelegansDataset(labels_name_required, csv_file_val, self.root_dir, transform=trans)
+        train_set = CelegansDataset(labels_name_required, csv_file_val, self.root_dir, transform=trans, label_type='pdf')
         val_set = CelegansDataset(labels_name_required, csv_file_train, self.root_dir)
-        batch_size = 5
+        batch_size = 64
         val_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size)
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)
-        for batch in train_loader:
-            print(batch['label'])
+        import tqdm
+        data_loader = tqdm.tqdm(train_loader)
+        i = 1
+        print('\n********')
+        for step, batch in enumerate(data_loader):
+            label = batch['label']
+            image = batch['image']
+            pdf_label = batch['pdf_label']
+            print('batch', i)
+            print('label.shape', label.shape)
+            print('image.shape', image.shape)
+            print('pdf_label.shape', pdf_label.shape)
+            i += 1
+            if i >= 3:
+                break
+        print('********')
+
+    def test_fast_load(self):
+        file_path = 'D:\\Dataset\\线虫分类数据集transformed\\C_dataset_transformed.pth'
+        normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        trans = torchvision.transforms.Compose([
+            torchvision.transforms.RandomResizedCrop((224, 224), scale=(0.5, 1), ratio=(0.5, 2)),
+            torchvision.transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+            torchvision.transforms.RandomHorizontalFlip(),
+            torchvision.transforms.RandomVerticalFlip(),
+            torchvision.transforms.ToTensor(),
+            normalize
+        ])
+        train_set = CelegansDataset(label_type='pdf', fast_load=True, file_path=file_path)
+        batch_size = 64
+        train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)
+        import tqdm
+        data_loader = tqdm.tqdm(train_loader)
+        i = 1
+        print('\n********')
+        for step, batch in enumerate(data_loader):
+            label = batch['label']
+            image = batch['image']
+            pdf_label = batch['pdf_label']
+            print('batch', i)
+            print('label.shape', label.shape)
+            print('image.shape', image.shape)
+            print('pdf_label.shape', pdf_label.shape)
+            i += 1
+            if i >= 10:
+                break
         print('********')
 
     def test_save_weights(self):
@@ -222,5 +273,5 @@ class TestCelegansDataset(unittest.TestCase):
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestCelegansDataset("make_a_test_dataset")) 
+    suite.addTest(TestCelegansDataset("test_fast_load"))
     unittest.TextTestRunner(verbosity=2).run(suite)

@@ -4,19 +4,20 @@ import os
 import torch
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from PIL import Image
 from torchvision import transforms
 from lib.celegans_dataset import CelegansDataset, get_C_elegants_label
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def inference(args, config, network):
-    net = network(pretrained=True)
+    net = network()
     net.to(device)
     net.eval() # 评估模式, 这会关闭dropout
     if args.resume_weights:
-        model_file = os.path.join("./models/", args.model_dir, 'weights/epoch_%d.pth' % args.resume_weights)
+        model_file = os.path.join("./models/", args.model_dir, 'weights/model-%d.pth' % args.resume_weights)
         check_point = torch.load(model_file, map_location=device)
-        net.load_state_dict(check_point['state_dict'])
+        net.load_state_dict(check_point)
     ex_name = os.path.splitext(args.file_path)[1]
     if ex_name in ['.JPG', '.jpeg', '.jpg']:
         file_path = os.path.normpath(args.file_path)
@@ -26,10 +27,16 @@ def inference(args, config, network):
         image = torch.unsqueeze(image, 0)
 
         output = net(image.to(device))
-        infer_label = output.argmax(axis=1).item()
-        print('预测标签为: %d' % infer_label)
+        plt.plot(output.detach().cpu().numpy().reshape(-1, 1))
+        plt.savefig('output.jpg')
+        print('output:', output)
+        # infer_label = output.argmax(axis=1).item()
+         
+        rank = torch.Tensor([i for i in range(30)]).to(device)
+        infer_label = torch.sum(output * rank, dim=1)
+        print('预测标签为: %lf' % infer_label)
         print('真实标签为: %d' % label)
-        print('预测置信度为: %lf' % output[0, infer_label])
+        # print('预测置信度为: %lf' % output[0, infer_label])
                 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

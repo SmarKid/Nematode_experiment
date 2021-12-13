@@ -236,6 +236,7 @@ class VisionTransformer(nn.Module):
 
         nn.init.trunc_normal_(self.cls_token, std=0.02)
         self.apply(_init_vit_weights)
+        self.softmax = nn.Softmax(dim=1)
 
     def forward_features(self, x):
         # [B, C, H, W] -> [B, num_patches, embed_dim]
@@ -266,6 +267,7 @@ class VisionTransformer(nn.Module):
                 return (x + x_dist) / 2
         else:
             x = self.head(x)
+        x = self.softmax(x)
         return x
 
 

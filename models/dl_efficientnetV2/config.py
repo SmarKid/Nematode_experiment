@@ -44,25 +44,36 @@ class Config:
             normalize
         ])
     }
-    loss_function = 'CrossEntropyLoss'
+    loss_function = 'dldl_loss'
+    lambda1 = 0
     weight = torch.load('class_weights.pt')
     train_batch_size = 16                   # 训练的batch size
     val_batch_size = 1                     # 验证集的batch size
     begin_epoch = 0                         # 起始epoch
     train_require_layers = None   # 需要训练的层
     # pretrained_path = 'D:\\WorkSpace\\PycharmProjects\\Nematode_experiment\\models\\efficientnetV2\\weights\\pre_efficientnetv2-s.pth' # 预训练权重路径
-    pretrained_path = 'E:\\workspace\\python\\线虫实验\\models\\efficientnetV2\\weights\\pre_efficientnetv2-s.pth' # 预训练权重路径
+    pretrained_path = "E:\workspace\python\线虫实验\models\dl_efficientnetV2\weights\pre_efficientnetv2-s.pth"     # 预训练权重路径
     # 模型相关设置
     learning_rate = 0.001                # 学习率
     num_epochs = 100               # 迭代次数
 
     # 训练设置
     optimizer = 'SGD'
-    # SGD
-    momentum = 0.9
-    weight_decay = 5E-5
-    dampening = 0
-    nesterov = False
+    optim_args = {
+        'AdamW': {
+            'lr': 0.0000005,  # 学习率
+            'weight_decay': 5E-2,
+            'betas': (0.9, 0.999),
+            'eps': 1e-8
+        },
+        'SGD': {
+            'lr': 0.001,  # 学习率
+            'weight_decay': 5E-5,
+            'nesterov': False,
+            'dampening': 0,
+            'momentum': 0.9
+        }
+    }
 
 
 config = Config()

@@ -101,7 +101,7 @@ class TestTrain(unittest.TestCase):
         apply(img, config.trans)
     
     def test_evaluate(self):
-        csv_file_val = '.\\test\\csv files\\cele_df_val.csv'
+        csv_file_val = '.\\test\\test csv files\\cele_df_val.csv'
         labels_name_required = 'shoot_days'
         root_dir = 'E:\workspace\线虫数据集\分类数据集'
         normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -119,9 +119,21 @@ class TestTrain(unittest.TestCase):
         test_acc, test_loss = evaluate(data_loader=self.data_loader, model=net, device=device, epoch=1)
         print(test_acc, test_loss)
 
+    def test_cross_entropy_loss(self):
+        import math
+        p = 0.999
+        a = -(p*math.log(p)+(1-p)*math.log(1-p))
+        pass
+        loss = torch.nn.CrossEntropyLoss()
+        # y_pre:(batch_size, num_class) y_hat:(batch_size, num_class)
+        y_pre = torch.randn(5, 30)
+        y_hat = torch.randn(5, 30)
+        l = loss(y_pre, y_hat)
+        print(l)
+
 
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestTrain("test_evaluate"))  
+    suite.addTest(TestTrain("test_cross_entropy_loss"))  
     unittest.TextTestRunner(verbosity=2).run(suite)

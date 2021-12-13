@@ -1,4 +1,5 @@
 import torchvision
+import torch
 from torchvision.models.vgg import VGG, vgg16_bn, make_layers, cfgs, load_state_dict_from_url
 from torch.nn import init
 
@@ -14,10 +15,10 @@ model_urls = {
     'vgg19_bn': 'https://download.pytorch.org/models/vgg19_bn-c79401a0.pth',
 }
 
-def network(pretrained, batch_norm=True):
+def network(pretrained_path=None, batch_norm=True):
     model = VGG(make_layers(cfgs['D'], batch_norm=batch_norm), num_classes=30)
-    if pretrained:
-        state_dict = load_state_dict_from_url(model_urls['vgg16_bn'])
+    if pretrained_path:
+        state_dict = torch.load(pretrained_path)
         del state_dict['classifier.6.bias']
         del state_dict['classifier.6.weight']
         model.load_state_dict(state_dict, strict=False)
